@@ -1,6 +1,6 @@
 <?php
 $path = [
-    "path" => __DIR__ . "/.env"
+    "path" => base_path('.env');
 ];
 
 return $path["path"];
