@@ -1,4 +1,15 @@
 ## PROBLEM STATEMENT
+RUNTHESE IF WINDOWS
+
+```bash
+icacls .env /grant Users:"(R,W)"
+```
+if other then 
+```bash
+chmod 664 .env
+
+```
+
 
 # How to manage timezones in Laravel and MySQL
 
