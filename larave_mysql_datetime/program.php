@@ -1,14 +1,23 @@
 <?php
+// Include Laravel's autoloader if Laravel is available
+if (defined('LARAVEL_START')) {
+    require __DIR__.'/vendor/autoload.php';
+}
+
 /**
  * This script retrieves the absolute path to the .env file.
  *
  * @return string The absolute path to the .env file.
  */
 function getEnvFilePath(): string {
-    // Get the directory of the current script
-    $scriptDirectory = __DIR__;
+    // If Laravel is available, use base_path()
+    if (function_exists('base_path')) {
+        return base_path('.env');
+    }
+   
 
-    // Construct the absolute path to the .env file
+    // Otherwise, construct the path based on the current script's directory
+    $scriptDirectory = __DIR__;
     $envFilePath = $scriptDirectory . '/.env';
 
     return $envFilePath;
