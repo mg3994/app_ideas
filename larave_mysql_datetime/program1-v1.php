@@ -42,21 +42,21 @@ if (file_exists($envFilePath)) {
     // Modify the content in memory
     foreach ($lines as &$line) {
         if (preg_match('/^\s*APP_TIMEZONE\s*=\s*(.*)$/i', $line, $matches)) {
-            $line = "APP_TIMEZONE = '{$appTimezone}'\n";
+            $line = "APP_TIMEZONE={$appTimezone}\n";
             $appTimezoneExists = true;
         }
         if (preg_match('/^\s*DB_TIMEZONE\s*=\s*(.*)$/i', $line, $matches)) {
-            $line = "DB_TIMEZONE = '{$dbTimezone}'\n";
+            $line = "DB_TIMEZONE={$dbTimezone}\n";
             $dbTimezoneExists = true;
         }
     }
 
     // If the variables don't exist, add them to the end of the file
     if (!$appTimezoneExists) {
-        $lines[] = "APP_TIMEZONE = '{$appTimezone}'\n";
+        $lines[] = "APP_TIMEZONE={$appTimezone}\n";
     }
     if (!$dbTimezoneExists) {
-        $lines[] = "DB_TIMEZONE = '{$dbTimezone}'\n";
+        $lines[] = "DB_TIMEZONE={$dbTimezone}\n";
     }
 
     // Write the modified content back to the .env file
