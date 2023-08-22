@@ -14,6 +14,31 @@ function findLineNumberInFile($filePath, $targetText) {
     }
     return false; // Target text not found in the file
 }
+
+
+
+
+function openFileInVSCode($filePath, $lineNumber, $highlightText) {
+    // Sanitize inputs
+    $filePath = escapeshellarg($filePath);
+    $lineNumber = intval($lineNumber); // Make sure it's an integer
+    $highlightText = escapeshellarg($highlightText);
+
+    // Command to open the file in VS Code and scroll to the specified line
+    $openCommand = "code --goto $filePath:$lineNumber";
+
+    // Execute the open command
+    exec($openCommand);
+
+    // // Introduce a delay
+    // sleep(2); // Adjust the delay time as needed
+
+    // // Command to highlight text using the appropriate extension
+    // $highlightCommand = "code --command your.extension.highlightCommand $highlightText";
+
+    // // Execute the highlight command
+    // exec($highlightCommand);
+}
 /**
  * This script retrieves the absolute path to the .env file.
  *
