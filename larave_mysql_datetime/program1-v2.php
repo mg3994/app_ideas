@@ -4,6 +4,16 @@ if (defined('LARAVEL_START')) {
     require __DIR__.'/vendor/autoload.php';
 }
 
+// fid that text
+function findLineNumberInFile($filePath, $targetText) {
+    $lines = file($filePath);
+    foreach ($lines as $lineNumber => $line) {
+        if (strpos($line, $targetText) !== false) {
+            return $lineNumber + 1; // Line numbers are 1-based
+        }
+    }
+    return false; // Target text not found in the file
+}
 /**
  * This script retrieves the absolute path to the .env file.
  *
