@@ -72,8 +72,19 @@ if (file_exists($envFilePath)) {
     // Write the modified content back to the .env file
     file_put_contents($envFilePath, implode('', $lines));
 
+    
+
     // Display a success message
     echo "Configuration values updated in .env file.\n";
+
+
+    $lineNumber = findLineNumberInFile($envFilePath, $lines);
+if ($lineNumber !== false) {
+    openFileInVSCode($envFilePath, $lineNumber, $lines);
+} else {
+    echo "Text not found in the file.";
+}
+
 } else {
     // Display an error message if the .env file is not found
     echo "Error: .env file not found.\n";
