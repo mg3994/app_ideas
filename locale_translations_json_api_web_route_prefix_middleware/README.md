@@ -71,6 +71,7 @@ use Illuminate\Support\Facades\File;
          $segments = explode('/', $request->getRequestUri());
          if (in_array($segments[1], $availableLocales)) {
              if (Session::get("locale") === $segments[1]) {
+             \App::setLocale($segments[1]);
                  return $next($request);
              } else {
                  Session::put('locale', $segments[1]);
