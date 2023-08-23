@@ -1,4 +1,6 @@
-
+```bash
+php artisan lang:publish
+```
 create lang folder in resources
 add some en.json and other file or simply by locale code but by default en is needed
 add some dummy
