@@ -1,10 +1,19 @@
 import 'dart:io';
 
 void main() async {
-  final assetsDirectory = Directory('assets');
+  final List<String> assetDirectories = [
+    'assets', //add your own other like 'images' , 'fonts', 'google_fonts'
+  ];
   final List<String> assetEntries = [];
-  await _collectAssets(assetsDirectory, assetEntries);
+  for (final directory in assetDirectories) {
+    final assetsDirectory = Directory(directory);
+    await _collectAssets(assetsDirectory, assetEntries);
+  }
+  // final assetsDirectory =
+  //     Directory('assets'); // i also want to add "images" folder and 'fonts
+  // await _collectAssets(assetsDirectory, assetEntries);
   await addAssetsToPubspecYaml(assetEntries);
+  await generateConstantsDartFile(assetEntries);
 }
 
 Future<void> addAssetsToPubspecYaml(List<String> newAssetPaths) async {
@@ -17,8 +26,8 @@ Future<void> addAssetsToPubspecYaml(List<String> newAssetPaths) async {
   }
 
   final pubspecLines = await pubspecFile.readAsLines();
-  final assetsKeyIndex =
-      pubspecLines.indexWhere((line) => line.contains('  assets:'));
+  final assetsKeyIndex = pubspecLines.indexWhere((line) => line.contains(RegExp(
+      r'^ {2}assets:'))); //regex needed with two space at start of new line
 
   if (assetsKeyIndex == -1) {
     // 'assets:' key not found, adding it at the end
@@ -46,6 +55,7 @@ Future<void> addAssetsToPubspecYaml(List<String> newAssetPaths) async {
 
   // Write the updated pubspec.yaml file
   await pubspecFile.writeAsString(pubspecLines.join('\n'));
+  stdout.writeln('All done! Assets Path Added in pubspec.yaml');
 }
 
 Future<void> _collectAssets(
@@ -58,4 +68,42 @@ Future<void> _collectAssets(
       await _collectAssets(entity, assetEntries);
     }
   }
+}
+
+Future<void> generateConstantsDartFile(List<String> resourceFolders) async {
+  final generatedDir = Directory('lib/generated');
+  if (!generatedDir.existsSync()) {
+    generatedDir.createSync(recursive: true);
+  }
+
+  final constantsFile = File('lib/generated/assets_constants.dart');
+  final content = StringBuffer();
+
+  content.writeln('// Auto-generated file - Do not modify manually');
+  content.writeln('abstract class AssetsConstants {');
+
+  for (final folder in resourceFolders) {
+    final constantName = _convertToCamelCase(folder);
+  
+    content.writeln('  static const String $constantName = \'$folder\';');
+  }
+
+  content.writeln('}');
+
+  await constantsFile.writeAsString(content.toString());
+  stdout.writeln(
+      'Constants file generated at lib/generated/assets_constants.dart');
+}
+
+// Helper function to convert a path to Camel Case
+String _convertToCamelCase(String input) {
+  return input
+      .toLowerCase()
+      .split(RegExp(r'[/_-]'))
+      .where((part) => part.isNotEmpty)
+      .map((word) => word[0].toUpperCase() + word.substring(1))
+      .join('')
+      .replaceAll(RegExp(r'[./_-]'), '')
+      .replaceFirstMapped(
+          RegExp(r'^[A-Z]'), (match) => match.group(0)!.toLowerCase());
 }
