@@ -2,7 +2,8 @@ import 'dart:io';
 
 void main() async {
   final List<String> assetDirectories = [
-    'assets', //add your own other like 'images' , 'fonts', 'google_fonts'
+    'assets',
+    // 'images' //add your own other like 'images' , 'fonts', 'google_fonts'
   ];
   final List<String> assetEntries = [];
   for (final directory in assetDirectories) {
@@ -38,16 +39,29 @@ Future<void> addAssetsToPubspecYaml(List<String> newAssetPaths) async {
   } else {
     // 'assets:' key exists, remove existing asset paths and add new ones
     final linesToRemove = <String>[];
+    var inAssetsSection = false;
     for (var i = assetsKeyIndex + 1; i < pubspecLines.length; i++) {
       final line = pubspecLines[i];
       if (line.trim().isEmpty || line.trimLeft().startsWith('#')) {
-        continue; // Skip empty lines or comments
+        if (inAssetsSection) {
+          continue; // Skip empty lines or comments within assets section
+        }
+      } else if (line.trimLeft().startsWith('- ')) {
+        inAssetsSection = true;
+        linesToRemove.add(line);
+      } else {
+        // Reached a line outside of assets section
+        if (inAssetsSection) {
+          break;
+        }
       }
-      linesToRemove.add(line);
     }
 
-    pubspecLines.removeWhere((line) => linesToRemove.contains(line));
+    // Remove existing asset list
+    pubspecLines.removeRange(
+        assetsKeyIndex + 1, assetsKeyIndex + linesToRemove.length + 1);
 
+    // Add new asset paths
     for (final path in newAssetPaths) {
       pubspecLines.insert(assetsKeyIndex + 1, '    - $path');
     }
@@ -84,7 +98,7 @@ Future<void> generateConstantsDartFile(List<String> resourceFolders) async {
 
   for (final folder in resourceFolders) {
     final constantName = _convertToCamelCase(folder);
-  
+
     content.writeln('  static const String $constantName = \'$folder\';');
   }
 
@@ -104,6 +118,7 @@ String _convertToCamelCase(String input) {
       .map((word) => word[0].toUpperCase() + word.substring(1))
       .join('')
       .replaceAll(RegExp(r'[./_-]'), '')
+      .replaceAll(" ", "")
       .replaceFirstMapped(
           RegExp(r'^[A-Z]'), (match) => match.group(0)!.toLowerCase());
 }
