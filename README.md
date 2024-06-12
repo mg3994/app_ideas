@@ -1,5 +1,16 @@
 # app_ideas
 
+### use of unawaited
+
+```dart
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  unawaited(MobileAds.instance.initialize());
+
+  runApp(MyApp());
+}
+```
+
 ```php
 
 
